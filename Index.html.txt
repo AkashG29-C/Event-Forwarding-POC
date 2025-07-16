@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adobe WebSDK Event POC</title>
+  <script>
+    // placeholder for Adobe WebSDK
+    console.log("<script src="https://assets.adobedtm.com/e72b4113c11a/dea835227b36/launch-5cc6da518e0d-development.min.js" async></script>");
+  </script>
+</head>
+<body>
+  <h1>Welcome to Adobe WebSDK Demo Page</h1>
+  <button id="clickBtn">Click Me</button>
+
+  <script>
+    // Click event logic
+    document.getElementById("clickBtn").addEventListener("click", function () {
+      console.log("Button clicked – tracking event...");
+      // Adobe WebSDK sendEvent will go here
+    });
+
+    // Pageview load event
+    console.log("Pageview loaded – will connect to Adobe Edge using sendEvent");
+  </script>
+</body>
+</html>
