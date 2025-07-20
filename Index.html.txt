@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adobe WebSDK Event POC</title>
+
+  <!-- Adobe WebSDK via Launch -->
+  <script src="https://assets.adobedtm.com/e72b4113c11a/dea835227b36/launch-5cc6da518e0d-development.min.js" async></script>
+</head>
+
+<body>
+  <h1>Welcome to Adobe WebSDK Demo Page</h1>
+
+  <!-- Button Click -->
+  <button id="clickBtn">Click Me</button>
+
+  <!-- Email Form -->
+  <form id="emailForm">
+    <label for="email">Enter your email:</label>
+    <input type="email" id="emailInput" name="email" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // Helper: Get device info
+    function getDeviceInfo() {
+      return {
+        screenHeight: window.screen.height,
+        screenWidth: window.screen.width,
+        colorDepth: window.screen.colorDepth,
+        type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+      };
+    }
+
+    // Wait for Alloy
+    function waitForAlloy(callback) {
+      if (typeof alloy === "function") {
+        callback();
+      } else {
+        setTimeout(() => waitForAlloy(callback), 100);
+      }
+    }
+
+    waitForAlloy(function () {
+      // Manual config (if needed)
+      alloy("configure", {
+        edgeConfigId: "993a5934-4f41-4827-a059-00508caf6325",  // ✅ Your datastream ID
+        orgId: "0CEB60F754C7E06B0A4C98A2@AdobeOrg",            // ✅ Your orgId
+        debugEnabled: true
+      });
+
+      // Pageview
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Page loaded – sending pageview event");
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "pageView",
+            timestamp: new Date().toISOString(),
+            web: {
+              webPageDetails: {
+                name: "Home Page",
+                URL: window.location.href
+              }
+            },
+            device: getDeviceInfo()
+          }
+        });
+      });
+
+      // Button Click
+      document.getElementById("clickBtn").addEventListener("click", function () {
+        console.log("Button clicked – sending click event");
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "click",
+            web: {
+              webInteraction: {
+                name: "Click button",
+                type: "other"
+              }
+            },
+            device: getDeviceInfo()
+          },
+          type: "click"
+        });
+      });
+
+      // Email Form Submit
+      document.getElementById("emailForm").addEventListener("submit", function (e) {
+        e.preventDefault(); // prevent reload
+        const email = document.getElementById("emailInput").value;
+
+        console.log("Form submitted – sending form event with email:", email);
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "formSubmit",
+            person: {
+              personalEmail: {
+                address: email
+              }
+            },
+            web: {
+              webForm: {
+                name: "Email Submission Form"
+              }
+            },
+            device: getDeviceInfo()
+          },
+          type: "form"
+        });
+      });
+    });
+  </script>
+</body>
+</html>
