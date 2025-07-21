@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adobe WebSDK Event POC</title>
+
+  <!-- Load Adobe WebSDK via Launch -->
+  <script src="https://assets.adobedtm.com/e72b4113c11a/dea835227b36/launch-5cc6da518e0d-development.min.js" async></script>
+</head>
+
+<body>
+  <h1>Welcome to Adobe WebSDK Demo Page</h1>
+
+  <!-- Button Click Section -->
+  <button class="clickBtn">Click Me</button>
+
+  <!-- Email Form Section -->
+  <form id="emailForm">
+    <label for="email">Enter Email:</label>
+    <input type="email" id="emailInput" name="email" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <!-- New Section: Name Submit -->
+  <form id="nameForm">
+    <label for="nameInput">Write Your Name:</label>
+    <input type="text" id="nameInput" name="name" required />
+    <button type="submit">Submit Name</button>
+  </form>
+
+  <!-- New Section: Age Submit -->
+  <form id="ageForm">
+    <label for="ageInput">Write Your Age:</label>
+    <input type="number" id="ageInput" name="age" required />
+    <button type="submit">Complete</button>
+  </form>
+
+  <script>
+    function getDeviceInfo() {
+      return {
+        screenHeight: window.screen.height,
+        screenWidth: window.screen.width,
+        screenOrientation: (screen.orientation || {}).type || "unknown"
+      };
+    }
+
+    function waitForAlloy(callback) {
+      if (typeof alloy === "function") {
+        callback();
+      } else {
+        setTimeout(function () {
+          waitForAlloy(callback);
+        }, 100);
+      }
+    }
+
+    waitForAlloy(function () {
+      alloy("configure", {
+        edgeConfigId: "993a5934-4f41-4827-a059-00508caf6325",
+        orgId: "0CEB60F754C7E06B0A4C98A2@AdobeOrg",
+        debugEnabled: true
+      });
+
+      // Pageview event
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Page loaded – sending pageview event");
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "pageView",
+            timestamp: new Date().toISOString(),
+            web: {
+              webPageDetails: {
+                name: "Home Page",
+                URL: window.location.href
+              }
+            },
+            device: getDeviceInfo()
+          }
+        });
+      });
+
+      // Email form
+      document.getElementById("emailForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const email = document.getElementById("emailInput").value;
+        console.log("Email submitted");
+
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "formSubmit",
+            person: {
+              email: { address: email }
+            },
+            web: {
+              webInteraction: {
+                name: "Email Form Submission",
+                type: "form"
+              }
+            },
+            device: getDeviceInfo()
+          }
+        });
+      });
+
+      // Name form with bizBanking = true
+      document.getElementById("nameForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const name = document.getElementById("nameInput").value;
+        console.log("Name submitted");
+
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "nameSubmit",
+            _accenture_partner: {
+              BizBanking: true
+            },
+            web: {
+              webInteraction: {
+                name: "Name Submission",
+                type: "form"
+              }
+            },
+            device: getDeviceInfo()
+          }
+        });
+      });
+
+      // Age form with bizBanking = false
+      document.getElementById("ageForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const age = document.getElementById("ageInput").value;
+        console.log("Age submitted");
+
+        alloy("sendEvent", {
+          xdm: {
+            eventType: "ageSubmit",
+            _accenture_partner: {
+              BizBanking: false
+            },
+            web: {
+              webInteraction: {
+                name: "Age Submission",
+                type: "form"
+              }
+            },
+            device: getDeviceInfo()
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
