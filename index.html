@@ -49,6 +49,12 @@
     <button class="ageSubmitBtn" type="button" onclick="submitAge()">Submit Age</button>
   </div>
 
+  <div style="margin-bottom:10px;">
+    <label>Enter your Email:</label>
+    <input type="email" id="emailInput" />
+    <button class="emailSubmitBtn" type="button" onclick="submitEmail()">Submit Email</button>
+  </div>
+  
   <script>
     function submitName() {
       const nameValue = document.getElementById("nameInput").value;
@@ -84,6 +90,35 @@
           eventType: "ageSubmit",
           person: {
             age: parseInt(ageValue)
+          },
+          web: {
+            webInteraction: {
+              type: "other"
+            },
+            webPageDetails: {
+              URL: window.location.href
+            }
+          },
+          device: {
+            type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+          }
+        }
+      });
+    }
+
+    // Submit Email
+    function submitEmail() {
+      const emailValue = document.getElementById("emailInput").value;
+
+      alloy("sendEvent", {
+        xdm: {
+          eventType: "emailSubmit",
+          identityMap: {
+            email: [{
+              id: emailValue,
+              authenticatedState: "loggedIn",
+              primary: true
+            }]
           },
           web: {
             webInteraction: {
