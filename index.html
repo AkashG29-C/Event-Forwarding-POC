@@ -2,134 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Adobe WebSDK Event POC</title>
-  <script src="https://assets.adobedtm.com/e72b4113c11a/dea835227b36/launch-5cc6da518e0d-development.min.js" async></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Event Forwarding POC</title>
   <script>
-    // Initialize Alloy
-    alloy("configure", {
-      edgeConfigId: "993a5934-4f41-4827-a059-00508caf6325", // 
-      orgId: "0CEB60F754C7E06B0A4C98A2@AdobeOrg", // 
-      debugEnabled: true
-    });
+    // Alloy init setup (replace with your actual edge config ID)
+    window.alloy_alloy = {
+      edgeConfigId: "993a5934-4f41-4827-a059-00508caf6325",
+      orgId: "0CEB60F754C7E06B0A4C98A2@AdobeOrg"
+    };
+  </script>
+  <script src="https://assets.adobedtm.com/e72b4113c11a/dea835227b36/launch-5cc6da518e0d-development.min.js" async></script>
+</head>
+<body>
+  <h2>Submit Form Example</h2>
 
-    // Send Page View event on load
-    window.addEventListener("load", function () {
+  <!-- Email -->
+  <label>Email: </label>
+  <input type="email" id="emailInput" placeholder="Enter email">
+  <button class="emailSubmitBtn" onclick="submitEmail()">Submit Email</button>
+  <br><br>
+
+  <!-- Name -->
+  <label>Name: </label>
+  <input type="text" id="nameInput" placeholder="Enter name">
+  <button class="nameSubmitBtn" onclick="submitName()">Submit Name</button>
+  <br><br>
+
+  <!-- Age -->
+  <label>Age: </label>
+  <input type="number" id="ageInput" placeholder="Enter age">
+  <button class="ageSubmitBtn" onclick="submitAge()">Submit Age</button>
+
+  <script>
+    function getDeviceType() {
+      const ua = navigator.userAgent;
+      if (/mobile/i.test(ua)) return "Mobile";
+      if (/tablet/i.test(ua)) return "Tablet";
+      return "Desktop";
+    }
+
+    function submitEmail() {
+      const email = document.getElementById("emailInput").value;
       alloy("sendEvent", {
         xdm: {
-          eventType: "pageView",
+          eventType: "email_submit",
           web: {
             webPageDetails: {
               URL: window.location.href
-            },
-            webInteraction: {
-              type: "view"
             }
           },
           device: {
-            type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+            type: getDeviceType()
+          },
+          person: {
+            email: {
+              address: email
+            }
           }
         }
       });
-    });
-  </script>
-</head>
+    }
 
-<body style="font-family:sans-serif;padding:20px;">
-  <h2>WebSDK Form Demo</h2>
-
-  <div style="margin-bottom:10px;">
-    <label>Enter your Name:</label>
-    <input type="text" id="nameInput" />
-    <button class="nameSubmitBtn" type="button" onclick="submitName()">Submit Name</button>
-  </div>
-
-  <div style="margin-bottom:10px;">
-    <label>Enter your Age:</label>
-    <input type="number" id="ageInput" />
-    <button class="ageSubmitBtn" type="button" onclick="submitAge()">Submit Age</button>
-  </div>
-
-  <div style="margin-bottom:10px;">
-    <label>Enter your Email:</label>
-    <input type="email" id="emailInput" />
-    <button class="emailSubmitBtn" type="button" onclick="submitEmail()">Submit Email</button>
-  </div>
-  
-  <script>
     function submitName() {
-      const nameValue = document.getElementById("nameInput").value;
-
-      console.log("Submitting name:", nameValue);
-
+      const name = document.getElementById("nameInput").value;
       alloy("sendEvent", {
         xdm: {
-          eventType: "nameSubmit",
+          eventType: "name_submit",
           web: {
-            webInteraction: {
-              name: nameValue,
-              type: "other"
-            },
             webPageDetails: {
               URL: window.location.href
             }
           },
           device: {
-            type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
+            type: getDeviceType()
+          },
+          person: {
+            name: {
+              firstName: name
+            }
           }
         }
       });
     }
 
     function submitAge() {
-      const ageValue = document.getElementById("ageInput").value;
-
-      console.log("Submitting age:", ageValue);
-
+      const age = document.getElementById("ageInput").value;
       alloy("sendEvent", {
         xdm: {
-          eventType: "ageSubmit",
+          eventType: "age_submit",
+          web: {
+            webPageDetails: {
+              URL: window.location.href
+            }
+          },
+          device: {
+            type: getDeviceType()
+          },
           person: {
-            age: parseInt(ageValue)
-          },
-          web: {
-            webInteraction: {
-              type: "other"
-            },
-            webPageDetails: {
-              URL: window.location.href
+            personalDetails: {
+              age: age
             }
-          },
-          device: {
-            type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-          }
-        }
-      });
-    }
-
-    // Submit Email
-    function submitEmail() {
-      const emailValue = document.getElementById("emailInput").value;
-
-      alloy("sendEvent", {
-        xdm: {
-          eventType: "emailSubmit",
-          identityMap: {
-            email: [{
-              id: emailValue,
-              authenticatedState: "loggedIn",
-              primary: true
-            }]
-          },
-          web: {
-            webInteraction: {
-              type: "other"
-            },
-            webPageDetails: {
-              URL: window.location.href
-            }
-          },
-          device: {
-            type: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
           }
         }
       });
