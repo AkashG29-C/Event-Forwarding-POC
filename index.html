@@ -56,7 +56,28 @@
         orgId: "0CEB60F754C7E06B0A4C98A2@AdobeOrg",
         debugEnabled: true
       });
-
+      
+       //test code
+       document.addEventListener("DOMContentLoaded", function () {
+    // This will trigger an event 3 seconds after the page loads
+    setTimeout(function () {
+      alloy("sendEvent", {
+        xdm: {
+          eventType: "web.webInteraction.linkClicks",
+          web: {
+            webInteraction: {
+              name: "Test Click Button",
+              type: "other"
+            },
+            webPageDetails: {
+              URL: window.location.href
+            }
+          }
+        }
+      });
+    }, 3000);
+  });
+      
       // Page View Event
       document.addEventListener("DOMContentLoaded", function () {
         alloy("sendEvent", {
